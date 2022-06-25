@@ -27,6 +27,7 @@ use near_sdk::{env, log, near_bindgen, AccountId, Balance, PanicOnDefault, Promi
 #[near_bindgen]
 #[derive(BorshDeserialize, BorshSerialize, PanicOnDefault)]
 pub struct Contract {
+    owner: AccountId,
     token: FungibleToken,
     metadata: LazyOption<FungibleTokenMetadata>,
 }
@@ -65,18 +66,39 @@ impl Contract {
         assert!(!env::state_exists(), "Already initialized");
         metadata.assert_valid();
         let mut this = Self {
+            owner: owner_id,
             token: FungibleToken::new(b"a".to_vec()),
             metadata: LazyOption::new(b"m".to_vec(), Some(&metadata)),
         };
-        this.token.internal_register_account(&owner_id);
-        this.token.internal_deposit(&owner_id, total_supply.into());
+        this.token.internal_register_account(&this.owner);
+        this.token.internal_deposit(&this.owner, total_supply.into());
         near_contract_standards::fungible_token::events::FtMint {
-            owner_id: &owner_id,
+            owner_id: &this.owner,
             amount: &total_supply,
             memo: Some("Initial tokens supply is minted"),
         }
         .emit();
         this
+    }
+
+    pub fn mint(
+        &mut self,
+        to: AccountId,
+        amount: U128,
+    ) {
+        // get first account from token.accounts
+        let owner = &self.owner;
+        // check if owner equals callee
+        assert_eq!(owner, &env::signer_account_id(), "Only owner can mint");
+
+        self.token.internal_register_account(&to);
+        self.token.internal_deposit(&to, amount.into());
+        near_contract_standards::fungible_token::events::FtMint {
+            owner_id: &owner,
+            amount: &amount,
+            memo: Some("Minted"),
+        }
+        .emit();
     }
 
     fn on_account_closed(&mut self, account_id: AccountId, balance: Balance) {
