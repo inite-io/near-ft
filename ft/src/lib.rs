@@ -39,14 +39,16 @@ impl Contract {
     /// Initializes the contract with the given total supply owned by the given `owner_id` with
     /// default metadata (for example purposes only).
     #[init]
-    pub fn new_default_meta(owner_id: AccountId, total_supply: U128) -> Self {
+    pub fn new_default_meta(owner_id: AccountId, _total_supply: U128) -> Self {
         Self::new(
             owner_id,
-            total_supply,
+            // total_supply,
+            U128::from(0),
             FungibleTokenMetadata {
                 spec: FT_METADATA_SPEC.to_string(),
                 name: "Example NEAR fungible token".to_string(),
-                symbol: "EXAMPLE".to_string(),
+                // symbol: "IDEA".to_string(),
+                symbol: "INIT".to_string(),
                 icon: Some(DATA_IMAGE_SVG_NEAR_ICON.to_string()),
                 reference: None,
                 reference_hash: None,
@@ -91,7 +93,11 @@ impl Contract {
         // check if owner equals callee
         assert_eq!(owner, &env::signer_account_id(), "Only owner can mint");
 
-        self.token.internal_register_account(&to);
+        // near fungible token check if account already registered
+
+        // check if account is not registered
+
+        // self.token.internal_register_account(&to);
         self.token.internal_deposit(&to, amount.into());
         near_contract_standards::fungible_token::events::FtMint {
             owner_id: &owner,
