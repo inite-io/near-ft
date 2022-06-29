@@ -93,14 +93,9 @@ impl Contract {
         // check if owner equals callee
         assert_eq!(owner, &env::signer_account_id(), "Only owner can mint");
 
-        // near fungible token check if account already registered
-
-        // check if account is not registered
-
-        // self.token.internal_register_account(&to);
         self.token.internal_deposit(&to, amount.into());
         near_contract_standards::fungible_token::events::FtMint {
-            owner_id: &owner,
+            owner_id: &to,
             amount: &amount,
             memo: Some("Minted"),
         }
