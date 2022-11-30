@@ -46,9 +46,9 @@ impl Contract {
             U128::from(0),
             FungibleTokenMetadata {
                 spec: FT_METADATA_SPEC.to_string(),
-                name: "INIT Token".to_string(),
+                name: "IDEA Token".to_string(),
                 // symbol: "IDEA".to_string(),
-                symbol: "INIT".to_string(),
+                symbol: "IDEA".to_string(),
                 icon: Some(DATA_IMAGE_SVG_NEAR_ICON.to_string()),
                 reference: None,
                 reference_hash: None,
